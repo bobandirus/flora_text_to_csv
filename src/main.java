@@ -1,5 +1,5 @@
 /**
- * Created by sb823249 on 11/03/2015.
+ * Created by sb823249 on 12/03/2015.
  */
 
 import java.io.*;
@@ -19,9 +19,11 @@ public class main {
 
     public static void main(String[] args) throws IOException{
         int fileNumber = 0;
-        for (int c = 1; c < 4; c++){
+        //for (int c = 1; c < 9; c++){
+        for (int c = 7; c < 8; c++){
             fileNumber = c;
-            fileName = "C:\\Users\\sb823249\\Google Drive\\PhD!\\OCR thoughts\\ocrd text to database\\test one\\" + fileNumber + ".txt";
+            //fileName = "C:\\Users\\sb823249\\Google Drive\\PhD!\\OCR thoughts\\scans\\pinaceae\\ocring\\" + fileNumber + ".txt";
+            fileName = "" + System.getProperty("user.dir") + "\\" + fileNumber + ".txt";
             readDescription();
         }
         writeFile();
@@ -30,7 +32,7 @@ public class main {
 
     public static void readDescription() throws IOException{
         //List<String> descriptiveInput = Files.readAllLines(Paths.get("C:\\Users\\sb823249\\Google Drive\\PhD!\\OCR thoughts\\ocrd text to database\\test one\\1.txt"), StandardCharsets.UTF_8);
-        List<String> descriptiveInput = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
+        List<String> descriptiveInput = Files.readAllLines(Paths.get(fileName), StandardCharsets.ISO_8859_1);
         for (int c = 0; c < descriptiveInput.size(); c++){
             if (descriptiveInput.size() > 1){
                 System.out.print("your file did a bad");
@@ -39,9 +41,17 @@ public class main {
             ArrayList<String> bitsAdder = new ArrayList<String>();
             for (int b = 0; b < preBitsOne.length; b++){
                 Pattern speciesName = Pattern.compile("\\. [A-Z]\\. [a-z]");
+                Pattern endOfLine = Pattern.compile("\\. [A-Z]\\. ");
                 Matcher speciesPattern = speciesName.matcher(preBitsOne[b]);
+                Matcher lineEnder = endOfLine.matcher(preBitsOne[b]);
                 if (speciesPattern.find()){
                     bitsAdder.add(preBitsOne[b]);
+                }
+                else if (lineEnder.find()){
+                    String[] preAndPost = bits[b].split("\\. [1-99]\\. ");
+                    bitsAdder.add(preAndPost[0]);
+                    bitsAdder.add("\n");
+                    bitsAdder.add(preAndPost[1]);
                 }
                 else {
                     String[] addToAdder = preBitsOne[b].split("\\.");
@@ -62,7 +72,8 @@ public class main {
     }
 
     public static void readHeadings() throws IOException{
-        List<String> tableReader = Files.readAllLines(Paths.get("C:\\Users\\sb823249\\Google Drive\\PhD!\\OCR thoughts\\ocrd text to database\\test one\\database.csv"), StandardCharsets.UTF_8);
+        //List<String> tableReader = Files.readAllLines(Paths.get("C:\\Users\\sb823249\\Google Drive\\PhD!\\OCR thoughts\\scans\\pinaceae\\ocring\\database.csv"), StandardCharsets.UTF_8);
+        List<String> tableReader = Files.readAllLines(Paths.get("" + System.getProperty("user.dir") + "\\database.csv"), StandardCharsets.UTF_8);
         for (int c = 0; c < tableReader.size(); c++){
             tableHeadings = tableReader.get(c).split(",");
         }
@@ -86,10 +97,15 @@ public class main {
         for (int c = 0; c < tableHeadings.length; c++){
             for (int b = 0; b < sizeThree; b++){
                 Pattern speciesName = Pattern.compile("\\. [A-Z]\\. [a-z]");
+                Pattern endOfLine = Pattern.compile("\\. \\. ");
                 Matcher speciesPattern = speciesName.matcher(bits[b]);
+                Matcher lineEnder = endOfLine.matcher(bits[b]);
                 if (firstTime && speciesPattern.find()){
                     line[c] = bits[b];
                     firstTime = false;
+                }
+                else if (lineEnder.find()){
+                    line[c] = "\n";
                 }
                 else if (bits[b].contains(" ") && tableHeadings[c].contains(" ")){
                     boolean added = false;
@@ -169,7 +185,8 @@ public class main {
     }
 
     public static void writeFile() throws IOException{
-        FileWriter writer = new FileWriter("C:\\Users\\sb823249\\Google Drive\\PhD!\\OCR thoughts\\ocrd text to database\\test one\\output.csv");
+        //FileWriter writer = new FileWriter("C:\\Users\\sb823249\\Google Drive\\PhD!\\OCR thoughts\\scans\\pinaceae\\ocring\\output.csv");
+        FileWriter writer = new FileWriter("" + System.getProperty("user.dir") + "\\output.csv");
         String headders = Arrays.toString(tableHeadings);
         String headint = headders.replace("[", "");
         String headetete = headint.replace(", ", ",");
